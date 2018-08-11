@@ -1,29 +1,37 @@
 /*
-GAME RULES:
-
-- The game has 2 players, playing in rounds
-- In each turn, a player rolls a dice as many times as he whishes. Each result get added to his ROUND score
-- BUT, if the player rolls a 1, all his ROUND score gets lost. After that, it's the next player's turn
-- The player can choose to 'Hold', which means that his ROUND score gets added to his GLBAL score. After that, it's the next player's turn
-- The first player to reach 100 points on GLOBAL score wins the game
-
+CHALLENGES:
+1. A player looses his entire score when he rolls two 6 in a row. After that it's the next player turn.
+2. Add an input field to the HTML where player can set predefined wining score.
+3. Add another dice to the game, so now there are 2 dices. The player looses his current score when one of them is 1.
 */
-var scores, roundScore, activePlayer, isGamePlaying;
+var scores, roundScore, activePlayer, isGamePlaying, lastDice;
 
 init();
 
 document.querySelector(".btn-roll").addEventListener("click", function () {
   if (!isGamePlaying) return;
   //1.random number
-  var dice = Math.floor(Math.random() * 6) + 1;
+  var dice1 = Math.floor(Math.random() * 6) + 1;
+  var dice2 = Math.floor(Math.random() * 6) + 1;
   //2. display the result
-  var diceDOM = document.querySelector(".dice");
-  diceDOM.style.display = "block";
-  diceDOM.src = "dice-" + dice + ".png";
+  document.getElementById("dice1").style.display = "block";
+  document.getElementById("dice2").style.display = "block";
+  document.getElementById("dice1").src = "dice-" + dice1 + ".png";
+  document.getElementById("dice2").src = "dice-" + dice2 + ".png";
+
+  /* if (dice === 6 && lastDice === 6) {
+     console.log(dice);
+     scores[activePlayer] = 0;
+     document.getElementById("score-" + activePlayer).textContent = scores[activePlayer];
+     isGamePlaying = false;
+     //allowing dice-6 to be displayed
+     setTimeout(nextPlayer, 1000);
+   }*/
   //3. Update the round score only if rolled number is not 1
-  if (dice !== 1) {
+  if (dice1 !== 1 && dice2 !== 1) {
     //addScore
-    roundScore += dice;
+    roundScore += dice1 + dice2;
+    //lastDice = dice;
     document.querySelector("#current-" + activePlayer).textContent = roundScore;
   } else {
     isGamePlaying = false;
@@ -37,14 +45,17 @@ document.querySelector(".btn-hold").addEventListener("click", function () {
   //add current score to user global score
   scores[activePlayer] += roundScore;
   //update UI
-  document.getElementById("score-" + activePlayer).textContent =
-    scores[activePlayer];
+  document.getElementById("score-" + activePlayer).textContent = scores[activePlayer];
   document.getElementById("current-" + activePlayer).textContent = "0";
 
+  var winningScore;
+  var input = document.querySelector(".winning-score").value;
+  winningScore = input ? input : 100;
   //check if player won the game
-  if (scores[activePlayer] >= 100) {
+  if (scores[activePlayer] >= winningScore) {
     document.getElementById("name-" + activePlayer).textContent = "Winner!";
-    document.querySelector(".dice").style.display = "none";
+    document.getElementById("dice1").style.display = "none";
+    document.getElementById("dice2").style.display = "none";
     document.querySelector(".player-" + activePlayer + "-panel").classList.add("winner");
     document.querySelector(".player-" + activePlayer + "-panel").classList.remove("active");
     isGamePlaying = false;
@@ -65,7 +76,8 @@ function nextPlayer() {
   document.querySelector(".player-0-panel").classList.toggle("active");
   document.querySelector(".player-1-panel").classList.toggle("active");
 
-  document.querySelector(".dice").style.display = "none";
+  document.getElementById("dice1").style.display = "none";
+  document.getElementById("dice2").style.display = "none";
 }
 
 function init() {
@@ -74,7 +86,8 @@ function init() {
   activePlayer = 0;
   isGamePlaying = true;
 
-  document.querySelector(".dice").style.display = "none";
+  document.getElementById("dice1").style.display = "none";
+  document.getElementById("dice2").style.display = "none";
 
   document.getElementById("score-0").textContent = "0";
   document.getElementById("score-1").textContent = "0";
